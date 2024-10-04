@@ -101,18 +101,18 @@
   align-items: center;
   gap: 1rem;
 }
-.socialMedia ul {
+.SocialMedia ul {
   display: flex;
   list-style: none;
   gap: 2rem;
   filter: var(--filterOne);
 }
-.socialMedia img {
+.SocialMedia img {
   width: 2rem;
   height: 2rem;
   cursor: pointer;
 }
-.socialMedia img:hover {
+.SocialMedia img:hover {
   border-radius: 50%;
   filter: drop-shadow(1px 1px 10px var(--colorHouver));
 }
