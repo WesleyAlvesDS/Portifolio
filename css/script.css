@@ -1,4 +1,3 @@
-
 .logo {
   background: var(--bgImg);
   width: 7rem;
@@ -39,7 +38,6 @@
   gap: 1rem;
 }
 .navegation ul li {
-  
   display: flex;
   margin: 0;
   width: 16rem;
