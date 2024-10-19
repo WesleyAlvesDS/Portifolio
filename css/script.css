@@ -1,3 +1,4 @@
+
 .logo {
   background: var(--bgImg);
   width: 7rem;
@@ -38,6 +39,7 @@
   gap: 1rem;
 }
 .navegation ul li {
+  
   display: flex;
   margin: 0;
   width: 16rem;
@@ -99,18 +101,18 @@
   align-items: center;
   gap: 1rem;
 }
-.SocialMedia ul {
+.socialMedia ul {
   display: flex;
   list-style: none;
   gap: 2rem;
   filter: var(--filterOne);
 }
-.SocialMedia img {
+.socialMedia img {
   width: 2rem;
   height: 2rem;
   cursor: pointer;
 }
-.SocialMedia img:hover {
+.socialMedia img:hover {
   border-radius: 50%;
   filter: drop-shadow(1px 1px 10px var(--colorHouver));
 }
