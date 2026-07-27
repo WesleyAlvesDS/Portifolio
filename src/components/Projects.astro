@@ -12,7 +12,7 @@ import { resume } from '../data/resume';
 
     <div class="projects-grid" data-reveal="delay-1">
       {resume.projects.map((project) => (
-        <article class="project-card">
+        <article class={`project-card${'highlight' in project && project.highlight ? ' featured' : ''}`}>
           <div class="project-top">
             <div class="project-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -49,6 +49,15 @@ import { resume } from '../data/resume';
               <span class="project-tag">{tag}</span>
             ))}
           </div>
+          {'url' in project && project.url && (
+            <a href={project.url} target="_blank" rel="noopener noreferrer" class="project-cta">
+              Conhecer
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </a>
+          )}
         </article>
       ))}
     </div>
@@ -178,6 +187,25 @@ import { resume } from '../data/resume';
     flex-direction: column;
   }
 
+  .project-card.featured {
+    border-color: transparent;
+    background: linear-gradient(var(--bg-card), var(--bg-card)) padding-box,
+                linear-gradient(135deg, var(--accent), var(--accent-secondary), var(--accent)) border-box;
+    border: 2px solid transparent;
+    box-shadow: 0 0 30px color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
+  .project-card.featured::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
   .project-card::after {
     content: '';
     position: absolute;
@@ -304,6 +332,30 @@ import { resume } from '../data/resume';
     color: var(--text-secondary);
     border: 1px solid var(--bg-card-border);
     font-family: var(--font-mono);
+  }
+
+  .project-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+    padding: 0.65rem 1.6rem;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, var(--accent-secondary)));
+    color: #0a0a0f;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all var(--transition);
+    width: fit-content;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+
+  .project-cta:hover {
+    transform: translateY(-2px) translateX(3px);
+    box-shadow: 0 6px 24px color-mix(in srgb, var(--accent) 35%, transparent);
+    opacity: 1;
   }
 
   /* GitHub */
@@ -485,5 +537,11 @@ import { resume } from '../data/resume';
     .projects-grid { grid-template-columns: 1fr; }
     .github-grid { grid-template-columns: 1fr; }
     .github-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  }
+
+  @media (max-width: 480px) {
+    .project-card { padding: 1.25rem; }
+    .project-name { font-size: 1.1rem; }
+    .github-card { padding: 1rem; }
   }
 </style>

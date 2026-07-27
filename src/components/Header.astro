@@ -4,7 +4,7 @@
 <header class="header" data-reveal>
   <div class="container header-inner">
     <a href="/" class="header-logo">
-      <img src="/images/profile.png" alt="Wesley Alves" class="header-logo-img" />
+      <img src="/images/profile.png" alt="Wesley Alves" class="header-logo-img" loading="eager" />
       <span class="header-logo-text">Wesley Alves</span>
     </a>
     <nav class="header-nav">
@@ -154,6 +154,20 @@
     background: var(--text-primary);
     border-radius: 2px;
     transition: all var(--transition);
+    transform-origin: center;
+  }
+
+  .header-menu-btn.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .header-menu-btn.active span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .header-menu-btn.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
   }
 
   .mobile-menu {

@@ -124,6 +124,7 @@ const {
 
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 80px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -159,6 +160,8 @@ const {
 
   .section {
     padding: var(--section-gap) 0;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 800px;
   }
 
   .section-label {
@@ -208,6 +211,23 @@ const {
   @media (max-width: 768px) {
     :root {
       --section-gap: 4rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+
+    html {
+      scroll-behavior: auto;
+    }
+
+    [data-reveal] {
+      opacity: 1;
+      transform: none;
     }
   }
 </style>

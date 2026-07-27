@@ -58,7 +58,7 @@ import { resume } from '../data/resume';
     </div>
     <div class="hero-visual" data-reveal="delay-2">
       <div class="hero-card">
-        <img src="/images/profile.png" alt="Wesley Alves" class="hero-card-avatar" />
+        <img src="/images/profile.png" alt="Wesley Alves" class="hero-card-avatar" loading="eager" />
         <div class="hero-card-info">
           <span class="hero-card-label">Localização</span>
           <span class="hero-card-value">{resume.location}</span>
@@ -211,14 +211,15 @@ import { resume } from '../data/resume';
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
+    padding: 0.8rem 1.75rem;
     border-radius: var(--radius-sm);
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: all var(--transition);
     border: none;
     font-family: var(--font-sans);
+    letter-spacing: 0.02em;
   }
 
   .btn-primary {
@@ -228,8 +229,8 @@ import { resume } from '../data/resume';
   }
 
   .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px var(--accent-glow);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 35px var(--accent-glow);
     opacity: 1;
   }
 
@@ -243,6 +244,7 @@ import { resume } from '../data/resume';
     background: var(--bg-card-hover);
     border-color: var(--accent);
     color: var(--accent);
+    transform: translateY(-2px);
     opacity: 1;
   }
 
@@ -366,11 +368,47 @@ import { resume } from '../data/resume';
 
     .hero-badge { margin: 0 auto 1.5rem; }
     .hero-summary { margin: 0 auto 2rem; }
-    .hero-actions { justify-content: center; }
+    .hero-actions { justify-content: center; flex-wrap: wrap; }
     .hero-socials { justify-content: center; }
     .hero-visual { order: -1; }
 
     .hero-card { max-width: 300px; padding: 1.5rem; }
+
+    .hero-actions .btn {
+      padding: 0.7rem 1.25rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero {
+      min-height: auto;
+      padding-top: 4.5rem;
+      padding-bottom: 2rem;
+    }
+
+    .hero-name {
+      font-size: clamp(2rem, 8vw, 2.8rem);
+    }
+
+    .hero-summary {
+      font-size: 0.9rem;
+    }
+
+    .hero-card {
+      max-width: 260px;
+      padding: 1.25rem;
+    }
+
+    .hero-card-avatar {
+      width: 56px;
+      height: 56px;
+    }
+
+    .hero-actions .btn {
+      padding: 0.65rem 1rem;
+      font-size: 0.8rem;
+    }
   }
 </style>
 

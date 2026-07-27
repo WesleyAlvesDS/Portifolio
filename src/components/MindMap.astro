@@ -13,7 +13,14 @@ const { mindmap } = resume;
 
     <div class="mindmap-canvas-wrapper" data-reveal="delay-1">
       <canvas class="mindmap-canvas" id="mindmap-canvas"></canvas>
+      <div class="mindmap-hint" id="mindmap-hint">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 9l-3 3 3 3"/><path d="M9 5l3-3 3 3"/><path d="M15 19l3-3-3-3"/><path d="M19 9l-3 3 3 3"/></svg>
+        Arraste para mover · Scroll para zoom
+      </div>
       <div class="mindmap-tooltip" id="mindmap-tooltip"></div>
+      <button class="mindmap-reset" id="mindmap-reset" title="Resetar posição">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+      </button>
     </div>
 
     <div class="mindmap-cards" data-reveal="delay-1">
@@ -28,15 +35,6 @@ const { mindmap } = resume;
               <li>{item}</li>
             ))}
           </ul>
-        </div>
-      ))}
-    </div>
-
-    <div class="mindmap-legend" data-reveal="delay-2">
-      {mindmap.branches.map((branch) => (
-        <div class="legend-item">
-          <span class="legend-dot" style={`background: ${branch.color}`}></span>
-          <span class="legend-label">{branch.label}</span>
         </div>
       ))}
     </div>
@@ -58,6 +56,8 @@ const { mindmap } = resume;
     }
 
     const tooltip = document.getElementById('mindmap-tooltip');
+    const hint = document.getElementById('mindmap-hint');
+    const resetBtn = document.getElementById('mindmap-reset');
     const dpr = window.devicePixelRatio || 1;
 
     const rect = wrapper.getBoundingClientRect();
@@ -71,19 +71,27 @@ const { mindmap } = resume;
     const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
 
-    const padding = Math.min(w, h) * 0.08;
+    // pan & zoom state
+    let panX = 0, panY = 0;
+    let scale = 1;
+    let isDragging = false;
+    let dragStartX = 0, dragStartY = 0;
+    let panStartX = 0, panStartY = 0;
+    let hasDragged = false;
+
     const cx = w / 2;
     const cy = h / 2;
-    const centerR = Math.min(w, h) * 0.065;
-    const branchR = Math.min(w - padding * 2, h - padding * 2) * 0.3;
-    const leafDist = Math.min(w, h) * 0.17;
-    const fontSize = Math.max(10, Math.min(w, h) * 0.022);
+    const minDim = Math.min(w, h);
+    const centerR = minDim * 0.055;
+    const branchR = minDim * 0.26;
+    const leafDist = minDim * 0.28;
+    const fontSize = Math.max(10, minDim * 0.024);
 
     const branches = mindmap.branches;
     const angleStep = (Math.PI * 2) / branches.length;
     const startAngle = -Math.PI / 2;
 
-    const nodes = [];
+    let nodes = [];
 
     function getThemeColors() {
       const s = getComputedStyle(document.documentElement);
@@ -93,65 +101,82 @@ const { mindmap } = resume;
       };
     }
 
+    function screenToWorld(sx, sy) {
+      return {
+        x: (sx - panX) / scale,
+        y: (sy - panY) / scale,
+      };
+    }
+
     function draw() {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, w, h);
+      nodes = [];
       const colors = getThemeColors();
 
-      // center glow
-      const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, centerR * 3);
-      cg.addColorStop(0, 'rgba(0,212,170,0.07)');
+      // apply pan/zoom
+      ctx.save();
+      ctx.translate(panX, panY);
+      ctx.scale(scale, scale);
+
+      // subtle center glow
+      const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, centerR * 4);
+      cg.addColorStop(0, 'rgba(0,212,170,0.06)');
       cg.addColorStop(1, 'rgba(0,212,170,0)');
       ctx.fillStyle = cg;
       ctx.beginPath();
-      ctx.arc(cx, cy, centerR * 3, 0, Math.PI * 2);
+      ctx.arc(cx, cy, centerR * 4, 0, Math.PI * 2);
       ctx.fill();
 
-      // connections center -> branch
+      // smooth curves: center -> branch
       branches.forEach((b, i) => {
         const a = startAngle + i * angleStep;
         const bx = cx + Math.cos(a) * branchR;
         const by = cy + Math.sin(a) * branchR;
+        const cpx = cx + Math.cos(a) * branchR * 0.5 + Math.cos(a + 0.3) * branchR * 0.15;
+        const cpy = cy + Math.sin(a) * branchR * 0.5 + Math.sin(a + 0.3) * branchR * 0.15;
+
         ctx.beginPath();
         ctx.moveTo(cx, cy);
-        const mx = (cx + bx) / 2;
-        const my = (cy + by) / 2;
-        ctx.quadraticCurveTo(mx + (by - cy) * 0.1, my - (bx - cx) * 0.1, bx, by);
-        ctx.strokeStyle = b.color + '25';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([6, 5]);
+        ctx.quadraticCurveTo(cpx, cpy, bx, by);
+        ctx.strokeStyle = b.color + '20';
+        ctx.lineWidth = 1.5;
         ctx.stroke();
-        ctx.setLineDash([]);
       });
 
-      // connections branch -> leaves
+      // smooth curves: branch -> leaves
       branches.forEach((b, i) => {
         const a = startAngle + i * angleStep;
         const bx = cx + Math.cos(a) * branchR;
         const by = cy + Math.sin(a) * branchR;
         const count = b.items.length;
-        const spread = Math.min(Math.PI * 0.65, count * 0.28);
+        const spread = Math.min(Math.PI * 0.7, count * 0.3);
 
         b.items.forEach((item, ii) => {
           const t = count === 1 ? 0 : (ii / (count - 1)) - 0.5;
           const la = a + t * spread;
           const lx = bx + Math.cos(la) * leafDist;
           const ly = by + Math.sin(la) * leafDist;
+          const midX = (bx + lx) / 2 + Math.cos(la + 0.5) * leafDist * 0.08;
+          const midY = (by + ly) / 2 + Math.sin(la + 0.5) * leafDist * 0.08;
+
           ctx.beginPath();
           ctx.moveTo(bx, by);
-          ctx.lineTo(lx, ly);
-          ctx.strokeStyle = b.color + '12';
+          ctx.quadraticCurveTo(midX, midY, lx, ly);
+          ctx.strokeStyle = b.color + '10';
           ctx.lineWidth = 1;
           ctx.stroke();
         });
       });
 
-      // leaves
+      // leaf pills
       branches.forEach((b, i) => {
         const a = startAngle + i * angleStep;
         const bx = cx + Math.cos(a) * branchR;
         const by = cy + Math.sin(a) * branchR;
         const count = b.items.length;
-        const spread = Math.min(Math.PI * 0.65, count * 0.28);
+        const spread = Math.min(Math.PI * 0.7, count * 0.3);
 
         b.items.forEach((item, ii) => {
           const t = count === 1 ? 0 : (ii / (count - 1)) - 0.5;
@@ -161,15 +186,15 @@ const { mindmap } = resume;
 
           ctx.font = `500 ${fontSize}px Inter, sans-serif`;
           const tw = ctx.measureText(item).width;
-          const pw = tw + 16;
-          const ph = fontSize * 1.8;
+          const pw = tw + 20;
+          const ph = fontSize * 2;
           const pr = ph / 2;
 
           ctx.beginPath();
           ctx.roundRect(lx - pw / 2, ly - ph / 2, pw, ph, pr);
-          ctx.fillStyle = b.color + '0d';
+          ctx.fillStyle = b.color + '0a';
           ctx.fill();
-          ctx.strokeStyle = b.color + '28';
+          ctx.strokeStyle = b.color + '20';
           ctx.lineWidth = 1;
           ctx.stroke();
 
@@ -182,31 +207,31 @@ const { mindmap } = resume;
         });
       });
 
-      // branches
+      // branch circles
       branches.forEach((b, i) => {
         const a = startAngle + i * angleStep;
         const bx = cx + Math.cos(a) * branchR;
         const by = cy + Math.sin(a) * branchR;
-        const br = centerR * 0.7;
+        const br = centerR * 0.8;
 
-        const bg = ctx.createRadialGradient(bx, by, 0, bx, by, br * 2.5);
-        bg.addColorStop(0, b.color + '12');
+        const bg = ctx.createRadialGradient(bx, by, 0, bx, by, br * 3);
+        bg.addColorStop(0, b.color + '10');
         bg.addColorStop(1, b.color + '00');
         ctx.fillStyle = bg;
         ctx.beginPath();
-        ctx.arc(bx, by, br * 2.5, 0, Math.PI * 2);
+        ctx.arc(bx, by, br * 3, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.beginPath();
         ctx.arc(bx, by, br, 0, Math.PI * 2);
-        ctx.fillStyle = b.color + '18';
+        ctx.fillStyle = b.color + '15';
         ctx.fill();
-        ctx.strokeStyle = b.color;
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = b.color + '80';
+        ctx.lineWidth = 1.5;
         ctx.stroke();
 
         ctx.fillStyle = b.color;
-        ctx.font = `700 ${fontSize * 1.1}px Inter, sans-serif`;
+        ctx.font = `600 ${fontSize * 1}px Inter, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(b.label, bx, by);
@@ -224,64 +249,103 @@ const { mindmap } = resume;
       ctx.fill();
 
       ctx.fillStyle = 'white';
-      ctx.font = `800 ${fontSize * 1.4}px Inter, sans-serif`;
+      ctx.font = `700 ${fontSize * 1.2}px Inter, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('Wesley', cx, cy - fontSize * 0.5);
-      ctx.font = `400 ${fontSize}px Inter, sans-serif`;
-      ctx.fillStyle = 'rgba(255,255,255,0.75)';
-      ctx.fillText('Alves', cx, cy + fontSize * 0.7);
+      ctx.fillText('Wesley', cx, cy - fontSize * 0.4);
+      ctx.font = `400 ${fontSize * 0.8}px Inter, sans-serif`;
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.fillText('Alves', cx, cy + fontSize * 0.6);
 
       nodes.push({ x: cx, y: cy, r: centerR, label: 'Wesley Alves', type: 'center' });
+
+      ctx.restore();
     }
 
     draw();
 
-    let hovered = null;
-
-    canvas.addEventListener('mousemove', (e) => {
+    // --- Drag / Pan ---
+    function getCanvasXY(e) {
       const cr = canvas.getBoundingClientRect();
-      const mx = e.clientX - cr.left;
-      const my = e.clientY - cr.top;
-      let found = null;
+      if (e.touches) {
+        return { x: e.touches[0].clientX - cr.left, y: e.touches[0].clientY - cr.top };
+      }
+      return { x: e.clientX - cr.left, y: e.clientY - cr.top };
+    }
 
+    function onPointerDown(e) {
+      const pos = getCanvasXY(e);
+      isDragging = true;
+      hasDragged = false;
+      dragStartX = pos.x;
+      dragStartY = pos.y;
+      panStartX = panX;
+      panStartY = panY;
+      canvas.style.cursor = 'grabbing';
+      if (hint) hint.style.opacity = '0';
+    }
+
+    function onPointerMove(e) {
+      const pos = getCanvasXY(e);
+
+      if (isDragging) {
+        const dx = pos.x - dragStartX;
+        const dy = pos.y - dragStartY;
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) hasDragged = true;
+        panX = panStartX + dx;
+        panY = panStartY + dy;
+        draw();
+        if (tooltip) tooltip.style.opacity = '0';
+        return;
+      }
+
+      // hover detection (in world coords)
+      const world = screenToWorld(pos.x, pos.y);
+      let found = null;
       for (const n of nodes) {
         if (n.type === 'center' || n.type === 'branch') {
-          if (Math.hypot(mx - n.x, my - n.y) <= (n.r || 30) + 8) { found = n; break; }
+          if (Math.hypot(world.x - n.x, world.y - n.y) <= (n.r || 30) + 10) { found = n; break; }
         } else {
-          if (Math.abs(mx - n.x) < n.w / 2 + 6 && Math.abs(my - n.y) < n.h / 2 + 6) { found = n; break; }
+          if (Math.abs(world.x - n.x) < n.w / 2 + 8 && Math.abs(world.y - n.y) < n.h / 2 + 8) { found = n; break; }
         }
       }
 
       if (found !== hovered) {
         hovered = found;
         draw();
+
         if (found && found.type !== 'center') {
-          canvas.style.cursor = 'pointer';
+          canvas.style.cursor = 'grab';
           if (tooltip) {
             tooltip.innerHTML = found.type === 'branch'
-              ? `<strong style="color:${found.color}">${found.label}</strong><br/><span style="color:var(--text-secondary)">${found.items.join(' · ')}</span>`
+              ? `<strong style="color:${found.color}">${found.label}</strong><br/><span style="color:var(--text-secondary);font-size:0.75rem">${found.items.join(' · ')}</span>`
               : `<strong style="color:${found.color}">${found.label}</strong>`;
             tooltip.style.opacity = '1';
           }
           // highlight
+          ctx.save();
+          ctx.translate(panX, panY);
+          ctx.scale(scale, scale);
           if (found.type === 'branch') {
+            const br = centerR * 0.8;
             ctx.beginPath();
-            ctx.arc(found.x, found.y, found.r + 5, 0, Math.PI * 2);
-            ctx.strokeStyle = found.color + '50';
-            ctx.lineWidth = 3;
+            ctx.arc(found.x, found.y, br + 6, 0, Math.PI * 2);
+            ctx.strokeStyle = found.color + '40';
+            ctx.lineWidth = 2.5;
             ctx.stroke();
           } else {
             ctx.font = `500 ${fontSize}px Inter, sans-serif`;
-            const pw = ctx.measureText(found.label).width + 22;
+            const pw = ctx.measureText(found.label).width + 26;
+            const ph = found.h + 6;
             ctx.beginPath();
-            ctx.roundRect(found.x - pw / 2, found.y - found.h / 2 - 2, pw, found.h + 4, found.h / 2 + 2);
-            ctx.fillStyle = found.color + '20';
+            ctx.roundRect(found.x - pw / 2, found.y - ph / 2, pw, ph, ph / 2);
+            ctx.fillStyle = found.color + '18';
             ctx.fill();
-            ctx.strokeStyle = found.color;
+            ctx.strokeStyle = found.color + '80';
             ctx.lineWidth = 1.5;
             ctx.stroke();
           }
+          ctx.restore();
         } else {
           canvas.style.cursor = 'default';
           if (tooltip) tooltip.style.opacity = '0';
@@ -289,16 +353,53 @@ const { mindmap } = resume;
       }
 
       if (found && tooltip) {
-        tooltip.style.left = (e.clientX - cr.left + 16) + 'px';
-        tooltip.style.top = (e.clientY - cr.top - 12) + 'px';
+        const cr2 = canvas.getBoundingClientRect();
+        tooltip.style.left = (e.clientX - cr2.left + 16) + 'px';
+        tooltip.style.top = (e.clientY - cr2.top - 12) + 'px';
       }
-    });
+    }
 
+    function onPointerUp() {
+      isDragging = false;
+      canvas.style.cursor = 'default';
+    }
+
+    canvas.addEventListener('mousedown', onPointerDown);
+    canvas.addEventListener('mousemove', onPointerMove);
+    canvas.addEventListener('mouseup', onPointerUp);
     canvas.addEventListener('mouseleave', () => {
+      isDragging = false;
       hovered = null;
       draw();
       if (tooltip) tooltip.style.opacity = '0';
       canvas.style.cursor = 'default';
+    });
+
+    // touch
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); onPointerDown(e); }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); onPointerMove(e); }, { passive: false });
+    canvas.addEventListener('touchend', onPointerUp);
+
+    // --- Zoom with scroll ---
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const pos = getCanvasXY(e);
+      const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
+      const newScale = Math.min(Math.max(scale * zoomFactor, 0.4), 3);
+
+      // zoom toward cursor
+      panX = pos.x - (pos.x - panX) * (newScale / scale);
+      panY = pos.y - (pos.y - panY) * (newScale / scale);
+      scale = newScale;
+
+      if (hint) hint.style.opacity = '0';
+      draw();
+    }, { passive: false });
+
+    // --- Reset ---
+    resetBtn?.addEventListener('click', () => {
+      panX = 0; panY = 0; scale = 1;
+      draw();
     });
 
     let resizeTimer;
@@ -311,7 +412,6 @@ const { mindmap } = resume;
           return;
         }
         wrapper.style.display = '';
-        nodes.length = 0;
         const r = wrapper.getBoundingClientRect();
         canvas.width = r.width * dpr;
         canvas.height = r.height * dpr;
@@ -332,7 +432,6 @@ const { mindmap } = resume;
 </script>
 
 <style>
-  /* Canvas - Desktop only */
   .mindmap-canvas-wrapper {
     position: relative;
     margin-top: 3rem;
@@ -342,12 +441,63 @@ const { mindmap } = resume;
     border: 1px solid var(--bg-card-border);
     overflow: hidden;
     aspect-ratio: 16 / 9;
+    cursor: grab;
+  }
+
+  .mindmap-canvas-wrapper:active {
+    cursor: grabbing;
   }
 
   .mindmap-canvas {
     width: 100%;
     height: 100%;
     display: block;
+  }
+
+  .mindmap-hint {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--bg-card-border);
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 500;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.6s ease;
+    z-index: 5;
+    white-space: nowrap;
+  }
+
+  .mindmap-reset {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    border: 1px solid var(--bg-card-border);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    z-index: 5;
+  }
+
+  .mindmap-reset:hover {
+    background: var(--accent);
+    color: #0a0a0f;
+    border-color: var(--accent);
   }
 
   .mindmap-tooltip {
@@ -367,7 +517,6 @@ const { mindmap } = resume;
     line-height: 1.5;
   }
 
-  /* Cards - Mobile */
   .mindmap-cards {
     display: none;
     grid-template-columns: 1fr;
@@ -423,7 +572,6 @@ const { mindmap } = resume;
     font-size: 0.78rem;
     font-weight: 500;
     color: var(--text-secondary);
-    background: var(--card-accent, var(--accent));
     background: color-mix(in srgb, var(--card-accent) 10%, transparent);
     border: 1px solid color-mix(in srgb, var(--card-accent) 20%, transparent);
     transition: all var(--transition);
@@ -433,32 +581,6 @@ const { mindmap } = resume;
     background: var(--card-accent);
     color: white;
     transform: translateY(-1px);
-  }
-
-  .mindmap-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    justify-content: center;
-    margin-top: 1.5rem;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-  }
-
-  .legend-label {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    font-weight: 500;
   }
 
   @media (max-width: 768px) {

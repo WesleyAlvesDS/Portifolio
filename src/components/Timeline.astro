@@ -10,7 +10,7 @@ const allItems = [
     const match = item.period?.match(/(\d{4})/);
     return match ? parseInt(match[1]) : 0;
   };
-  return getOrder(b) - getOrder(a);
+  return getOrder(a) - getOrder(b);
 });
 ---
 
@@ -223,6 +223,44 @@ const allItems = [
 
     .timeline-card {
       max-width: 100%;
+    }
+
+    .timeline-item {
+      margin-bottom: 2rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .timeline-line {
+      left: 14px;
+    }
+
+    .timeline-item,
+    .timeline-item.left,
+    .timeline-item.right {
+      padding-left: 3rem;
+    }
+
+    .timeline-dot {
+      width: 30px;
+      height: 30px;
+    }
+
+    .timeline-item.left .timeline-dot,
+    .timeline-item.right .timeline-dot {
+      left: -1px;
+    }
+
+    .timeline-card {
+      padding: 1.15rem;
+    }
+
+    .timeline-role {
+      font-size: 1rem;
+    }
+
+    .timeline-desc {
+      font-size: 0.8rem;
     }
   }
 </style>

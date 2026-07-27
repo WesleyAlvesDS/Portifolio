@@ -3,7 +3,7 @@ export const resume = {
   title: 'Análise de Dados & Soluções Tecnológicas',
   summary:
     'Com mais de cinco anos de experiência no setor de tecnologia, sou um profissional em análise de dados e desenvolvimento de soluções tecnológicas (sistemas da informação e bancos de dados). Mas atuo em outras áreas de conhecimento por estarem conectadas com meu campo de estudo e formação.',
-  email: 'pro.wesleyalves@gmail.com',
+  email: 'wesleyprofissional2020@gmail.com',
   location: 'Nova Friburgo, RJ',
   socials: {
     linkedin: 'https://www.linkedin.com/in/wesley-alves-pro',
@@ -86,6 +86,7 @@ export const resume = {
       tags: ['Web', 'Blog', 'Conteúdo', 'UI/UX'],
       url: 'https://artigocomcafe.com',
       wip: true,
+      highlight: true,
     },
     {
       name: 'Librino',
@@ -100,9 +101,10 @@ export const resume = {
       subtitle: 'Ferramenta Web de Colagens',
       context: 'pasty.ordob.com',
       description:
-        'Ferramenta web para compartilhamento e gestão de textos/colagens online.',
-      tags: ['Web', 'Ferramenta', 'Frontend'],
+        'Desenvolvimento web da ferramenta para compartilhamento e gestão de textos/colagens online. Responsável apenas pela parte de frontend/desenvolvimento.',
+      tags: ['Web', 'Ferramenta', 'Frontend', 'Desenvolvimento Web'],
       url: 'https://pasty.ordob.com',
+      highlight: true,
     },
   ],
 
