@@ -7,36 +7,50 @@ import { resume } from '../data/resume';
     <div data-reveal>
       <p class="section-label">// Projetos</p>
       <h2 class="section-title">Projetos em Destaque</h2>
-      <p class="section-subtitle">Projetos reais puxados diretamente do meu GitHub.</p>
+      <p class="section-subtitle">Projetos pessoais e profissionais.</p>
     </div>
 
-    <div class="projects-featured" data-reveal="delay-1">
-      <article class="project-card project-featured">
-        <div class="project-header">
-          <div class="project-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-            </svg>
+    <div class="projects-grid" data-reveal="delay-1">
+      {resume.projects.map((project) => (
+        <article class="project-card">
+          <div class="project-top">
+            <div class="project-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+              </svg>
+            </div>
+            <div class="project-badges">
+              {'wip' in project && project.wip && <span class="project-badge wip">Em construção</span>}
+              {'url' in project && project.url && (
+                <a href={project.url} target="_blank" rel="noopener noreferrer" class="project-link" aria-label="Abrir projeto">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/>
+                    <line x1="10" y1="14" x2="21" y2="3"/>
+                  </svg>
+                </a>
+              )}
+            </div>
           </div>
-          <span class="project-badge">Projeto Acadêmico</span>
-        </div>
-        <h3 class="project-name">{resume.projects[0].name}</h3>
-        <p class="project-subtitle">{resume.projects[0].subtitle}</p>
-        <p class="project-context">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-            <circle cx="12" cy="10" r="3"/>
-          </svg>
-          {resume.projects[0].context}
-        </p>
-        <p class="project-desc">{resume.projects[0].description}</p>
-        <div class="project-tags">
-          {resume.projects[0].tags.map((tag) => (
-            <span class="project-tag">{tag}</span>
-          ))}
-        </div>
-      </article>
+          <h3 class="project-name">{project.name}</h3>
+          <p class="project-subtitle">{project.subtitle}</p>
+          <p class="project-context">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            {project.context}
+          </p>
+          <p class="project-desc">{project.description}</p>
+          <div class="project-tags">
+            {project.tags.map((tag) => (
+              <span class="project-tag">{tag}</span>
+            ))}
+          </div>
+        </article>
+      ))}
     </div>
 
     <div class="github-section" data-reveal="delay-2">
@@ -67,14 +81,14 @@ import { resume } from '../data/resume';
     <div class="skills-section" data-reveal="delay-3">
       <h3 class="skills-subtitle">Habilidades Técnicas</h3>
       <div class="skills-cloud">
-        {resume.skills.technical.map((skill, i) => (
+        {resume.skills.technical.map((skill) => (
           <span class="skill-pill tech">{skill}</span>
         ))}
       </div>
 
       <h3 class="skills-subtitle" style="margin-top: 2rem;">Ferramentas</h3>
       <div class="skills-cloud">
-        {resume.skills.tools.map((tool, i) => (
+        {resume.skills.tools.map((tool) => (
           <span class="skill-pill tool">{tool}</span>
         ))}
       </div>
@@ -144,48 +158,59 @@ import { resume } from '../data/resume';
     background: var(--bg-secondary);
   }
 
-  .projects-featured {
-    margin-top: 3rem;
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
     margin-bottom: 3rem;
   }
 
-  .project-featured {
-    padding: 2.5rem;
+  .project-card {
+    padding: 1.75rem;
     border-radius: var(--radius-lg);
     background: var(--bg-card);
     border: 1px solid var(--bg-card-border);
     transition: all var(--transition);
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
-  .project-featured::after {
+  .project-card::after {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 2px;
     background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+    opacity: 0;
+    transition: opacity var(--transition);
   }
 
-  .project-featured:hover {
+  .project-card:hover {
     background: var(--bg-card-hover);
     border-color: var(--accent);
-    box-shadow: var(--shadow-glow);
     transform: translateY(-3px);
+    box-shadow: var(--shadow-glow);
   }
 
-  .project-header {
+  .project-card:hover::after {
+    opacity: 1;
+  }
+
+  .project-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
   }
 
   .project-icon {
-    width: 52px;
-    height: 52px;
+    width: 44px;
+    height: 44px;
     border-radius: var(--radius);
     background: linear-gradient(135deg, var(--accent-glow), var(--accent-secondary-glow));
     display: flex;
@@ -194,56 +219,86 @@ import { resume } from '../data/resume';
     color: var(--accent);
   }
 
+  .project-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   .project-badge {
     font-family: var(--font-mono);
-    font-size: 0.7rem;
-    padding: 0.25rem 0.75rem;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.6rem;
     border-radius: 100px;
-    background: var(--accent-glow);
-    color: var(--accent);
     font-weight: 500;
+  }
+
+  .project-badge.wip {
+    background: #f59e0b18;
+    color: #f59e0b;
+    border: 1px solid #f59e0b30;
+  }
+
+  .project-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-card-hover);
+    color: var(--text-secondary);
+    transition: all var(--transition);
+  }
+
+  .project-link:hover {
+    background: var(--accent);
+    color: #0a0a0f;
+    opacity: 1;
   }
 
   .project-name {
-    font-size: 1.6rem;
+    font-size: 1.25rem;
     font-weight: 800;
     color: var(--text-primary);
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.25rem;
   }
 
   .project-subtitle {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: var(--accent);
     font-weight: 500;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.6rem;
   }
 
   .project-context {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
-    font-size: 0.85rem;
+    gap: 0.35rem;
+    font-size: 0.78rem;
     color: var(--text-muted);
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
+    font-family: var(--font-mono);
   }
 
   .project-desc {
-    font-size: 0.95rem;
+    font-size: 0.88rem;
     color: var(--text-secondary);
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+    flex: 1;
   }
 
   .project-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
 
   .project-tag {
-    padding: 0.3rem 0.8rem;
+    padding: 0.25rem 0.7rem;
     border-radius: 100px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 500;
     background: var(--bg-card-hover);
     color: var(--text-secondary);
@@ -251,7 +306,7 @@ import { resume } from '../data/resume';
     font-family: var(--font-mono);
   }
 
-  /* GitHub Section */
+  /* GitHub */
   .github-header {
     display: flex;
     align-items: center;
@@ -268,9 +323,7 @@ import { resume } from '../data/resume';
     color: var(--accent);
   }
 
-  .github-link:hover {
-    text-decoration: underline;
-  }
+  .github-link:hover { text-decoration: underline; }
 
   .github-grid {
     display: grid;
@@ -298,9 +351,7 @@ import { resume } from '../data/resume';
     animation: spin 0.8s linear infinite;
   }
 
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   .github-card {
     display: flex;
@@ -331,13 +382,13 @@ import { resume } from '../data/resume';
 
   .github-card-name {
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: var(--text-primary);
     font-family: var(--font-mono);
   }
 
   .github-card-desc {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: var(--text-secondary);
     line-height: 1.5;
     flex: 1;
@@ -352,7 +403,7 @@ import { resume } from '../data/resume';
     align-items: center;
     gap: 0.75rem;
     margin-top: 0.5rem;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     color: var(--text-muted);
   }
 
@@ -382,9 +433,7 @@ import { resume } from '../data/resume';
     color: var(--text-muted);
   }
 
-  .skills-section {
-    margin-top: 4rem;
-  }
+  .skills-section { margin-top: 4rem; }
 
   .skills-subtitle {
     font-size: 1.1rem;
@@ -433,14 +482,8 @@ import { resume } from '../data/resume';
   }
 
   @media (max-width: 768px) {
-    .github-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .github-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
-    }
+    .projects-grid { grid-template-columns: 1fr; }
+    .github-grid { grid-template-columns: 1fr; }
+    .github-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
   }
 </style>

@@ -36,6 +36,14 @@ export const resume = {
         'Criação e desenvolvimento do Pasty, ferramenta web para compartilhamento e gestão de textos/colagens online.',
     },
     {
+      role: 'Criação do Artigo com Café',
+      company: 'artigocomcafe.com — Blog de Cafeteria Digital',
+      period: '2025 — Em construção',
+      type: 'work',
+      description:
+        'Criação e desenvolvimento de blog temático sobre cafeteria digital. Projeto autoral com foco em conteúdo, experiência do usuário e monetização.',
+    },
+    {
       role: 'Atendimento / Vendas',
       company: 'Agropecuária Nova Friburgo ME',
       period: '01/2025 — 06/2026',
@@ -70,12 +78,31 @@ export const resume = {
 
   projects: [
     {
+      name: 'Artigo com Café',
+      subtitle: 'Blog de Cafeteria Digital',
+      context: 'artigocomcafe.com',
+      description:
+        'Blog autoral sobre cafeteria digital. Projeto em construção com foco em conteúdo, experiência do usuário e monetização.',
+      tags: ['Web', 'Blog', 'Conteúdo', 'UI/UX'],
+      url: 'https://artigocomcafe.com',
+      wip: true,
+    },
+    {
       name: 'Librino',
       subtitle: 'Sistema de Gestão de Estoque para Bibliotecas',
       context: 'Biblioteca Pública Municipal Maria Margarida Liguori — Nova Friburgo',
       description:
-        'Responsável pelo desenvolvimento de um sistema completo de armazenamento, banco de dados integrado e ferramentas de buscas usando API. Planejamento e elaboração de protótipos para alcançar o objetivo final usando a metodologia RAD.',
+        'Sistema completo de armazenamento, banco de dados integrado e ferramentas de buscas usando API. Metodologia RAD.',
       tags: ['Python', 'SQL', 'API', 'RAD', 'Banco de Dados'],
+    },
+    {
+      name: 'Pasty',
+      subtitle: 'Ferramenta Web de Colagens',
+      context: 'pasty.ordob.com',
+      description:
+        'Ferramenta web para compartilhamento e gestão de textos/colagens online.',
+      tags: ['Web', 'Ferramenta', 'Frontend'],
+      url: 'https://pasty.ordob.com',
     },
   ],
 
