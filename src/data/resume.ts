@@ -12,6 +12,30 @@ export const resume = {
 
   experience: [
     {
+      role: 'Estudante de Data Science',
+      company: 'Estácio de Sá — Polo Nova Friburgo',
+      period: '2024 — Atual',
+      type: 'work',
+      description:
+        'Graduação em andamento, aprofundando conhecimentos em análise de dados, machine learning e soluções tecnológicas.',
+    },
+    {
+      role: 'Autônomo — Soluções Tecnológicas',
+      company: 'Autônomo',
+      period: '2023 — Atual',
+      type: 'work',
+      description:
+        'Desenvolvimento de soluções sob demanda, consultoria em dados, automação e ferramentas tecnológicas para empresas e projetos próprios.',
+    },
+    {
+      role: 'Criação do Pasty',
+      company: 'pasty.ordob.com — Ferramenta Web',
+      period: '2025',
+      type: 'work',
+      description:
+        'Criação e desenvolvimento do Pasty, ferramenta web para compartilhamento e gestão de textos/colagens online.',
+    },
+    {
       role: 'Atendimento / Vendas',
       company: 'Agropecuária Nova Friburgo ME',
       period: '01/2025 — 06/2026',
@@ -31,15 +55,15 @@ export const resume = {
 
   education: [
     {
-      degree: 'Tecnólogo — Data Science',
-      institution: 'Estácio de Sá — Polo Nova Friburgo',
-      period: '2024 — Atual',
-      type: 'education',
-    },
-    {
       degree: 'Técnico em Informática',
       institution: 'EEEP Manoel Mano — CE',
       period: '2017 — 2019',
+      type: 'education',
+    },
+    {
+      degree: 'Desenvolvimento de Aplicações Python',
+      institution: 'Estácio de Sá',
+      period: '2026',
       type: 'education',
     },
   ],
@@ -95,8 +119,8 @@ export const resume = {
     { name: 'Liderança e Gestão de Equipes', issuer: 'ENAP', year: '2026' },
     { name: 'Inteligência Emocional', issuer: 'ENAP', year: '2026' },
     { name: 'Excelência no Atendimento', issuer: 'ILB', year: '2026' },
-    { name: 'Técnico em Informática', issuer: 'EEEP Manoel Mano', year: '2019' },
     { name: 'Auxiliar Administrativo', issuer: 'Idesc CE', year: '' },
+    { name: 'Técnico em Informática', issuer: 'EEEP Manoel Mano', year: '2019' },
   ],
 
   mindmap: {
