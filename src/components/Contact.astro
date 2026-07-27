@@ -152,7 +152,16 @@ const services = [
         </div>
       </div>
 
-      <form class="contact-form" id="form-contato" data-reveal="delay-1" data-form-contact>
+      <form
+        class="contact-form"
+        id="form-contato"
+        data-reveal="delay-1"
+        name="contato"
+        method="POST"
+        data-netlify="true"
+        data-netlify-honeypot="bot-field"
+      >
+        <input type="hidden" name="form-name" value="contato" />
         <div class="form-row">
           <div class="form-group">
             <label for="name">Nome *</label>
@@ -193,7 +202,8 @@ const services = [
           <textarea id="message" name="message" rows="5" required placeholder="Quanto mais detalhes sobre seu projeto, melhor posso preparar o orçamento. Inclua informações como: objetivo, prazo, funcionalidades desejadas..."></textarea>
         </div>
         <div class="form-honey" aria-hidden="true">
-          <input type="text" name="website" tabindex="-1" autocomplete="off" />
+          <label>Não preencha</label>
+          <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
         </div>
         <button type="submit" class="btn btn-primary btn-full">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -203,6 +213,10 @@ const services = [
           Enviar solicitação de orçamento
         </button>
         <p class="form-note">Responderei em até 24 horas úteis.</p>
+        <p class="form-alt">
+          Ou envie email diretamente:
+          <a href={`mailto:wesleyprofissional2020@gmail.com?subject=${encodeURIComponent('[Orçamento] Contato via Portfólio')}`} class="form-alt-link">wesleyprofissional2020@gmail.com</a>
+        </p>
       </form>
     </div>
   </div>
@@ -498,6 +512,25 @@ const services = [
     margin-top: -0.25rem;
   }
 
+  .form-alt {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: -0.5rem;
+  }
+
+  .form-alt-link {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--accent) 30%, transparent);
+    text-underline-offset: 2px;
+  }
+
+  .form-alt-link:hover {
+    text-decoration-color: var(--accent);
+  }
+
   @media (max-width: 768px) {
     .cta-banner {
       flex-direction: column;
@@ -554,52 +587,75 @@ const services = [
 </style>
 
 <script>
-  const form = document.querySelector('[data-form-contact]');
-  form?.addEventListener('submit', (e) => {
+  const form = document.querySelector('form[name="contato"]') as HTMLFormElement;
+  const btn = form?.querySelector('button[type="submit"]') as HTMLButtonElement;
+  const originalBtnHTML = btn?.innerHTML;
+
+  form?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const honey = form.querySelector('[name="website"]') as HTMLInputElement;
+
+    // Honeypot check
+    const honey = form.querySelector('[name="bot-field"]') as HTMLInputElement;
     if (honey?.value) return;
 
-    const fd = new FormData(form as HTMLFormElement);
-    const name = fd.get('name') || '';
-    const email = fd.get('email') || '';
-    const service = fd.get('service') || 'Não especificado';
-    const budget = fd.get('budget') || 'Não definido';
-    const message = fd.get('message') || '';
-
-    const body = [
-      `Olá Wesley,`,
-      ``,
-      `Gostaria de solicitar um orçamento.`,
-      ``,
-      `Nome: ${name}`,
-      `Email: ${email}`,
-      `Serviço: ${service}`,
-      `Orçamento: ${budget}`,
-      ``,
-      `Descrição do projeto:`,
-      `${message}`,
-      ``,
-      `Aguardo seu retorno.`,
-    ].join('\n');
-
-    const mailto = `mailto:wesleyprofissional2020@gmail.com?subject=${encodeURIComponent(`[Orçamento] ${service} — ${name}`)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
-
-    // Notificação de sucesso
-    const btn = form.querySelector('button[type="submit"]');
-    const originalHTML = btn?.innerHTML;
+    // Loading state
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Email aberto! Verifique seu cliente de email.`;
-      btn.style.background = '#22c55e';
+      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Enviando...`;
     }
-    setTimeout(() => {
-      if (btn && originalHTML) {
+
+    try {
+      const fd = new FormData(form);
+      const resp = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(fd as any).toString(),
+      });
+
+      if (resp.ok) {
+        // Sucesso
+        form.reset();
+        if (btn) {
+          btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Mensagem enviada com sucesso!`;
+          btn.style.background = '#22c55e';
+        }
+        setTimeout(() => {
+          if (btn && originalBtnHTML) {
+            btn.disabled = false;
+            btn.innerHTML = originalBtnHTML;
+            btn.style.background = '';
+          }
+        }, 4000);
+      } else {
+        throw new Error('Erro no envio');
+      }
+    } catch {
+      // Fallback: abre mailto
+      const fd = new FormData(form);
+      const name = fd.get('name') || '';
+      const email = fd.get('email') || '';
+      const service = fd.get('service') || 'Não especificado';
+      const budget = fd.get('budget') || 'Não definido';
+      const message = fd.get('message') || '';
+
+      const body = [
+        `Olá Wesley,`, ``,
+        `Gostaria de solicitar um orçamento.`, ``,
+        `Nome: ${name}`, `Email: ${email}`,
+        `Serviço: ${service}`, `Orçamento: ${budget}`, ``,
+        `Descrição do projeto:`, `${message}`, ``,
+        `Aguardo seu retorno.`,
+      ].join('\n');
+
+      const mailto = `mailto:wesleyprofissional2020@gmail.com?subject=${encodeURIComponent(`[Orçamento] ${service} — ${name}`)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailto;
+
+      form.reset();
+      if (btn && originalBtnHTML) {
         btn.disabled = false;
-        btn.innerHTML = originalHTML;
+        btn.innerHTML = originalBtnHTML;
         btn.style.background = '';
       }
-    }, 4000);
+    }
   });
 </script>
