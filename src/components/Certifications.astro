@@ -1,0 +1,107 @@
+---
+import { resume } from '../data/resume';
+---
+
+<section class="section certs-section" id="certificacoes">
+  <div class="container">
+    <div data-reveal>
+      <p class="section-label">// Certificações</p>
+      <h2 class="section-title">Certificações & Cursos</h2>
+      <p class="section-subtitle">Formação contínua e desenvolvimento profissional.</p>
+    </div>
+
+    <div class="certs-grid" data-reveal="delay-1">
+      {resume.certifications.map((cert, i) => (
+        <div class="cert-card" data-reveal={`delay-${Math.min(i % 4 + 1, 4)}`}>
+          <div class="cert-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="8" r="6"/>
+              <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/>
+            </svg>
+          </div>
+          <h3 class="cert-name">{cert.name}</h3>
+          <p class="cert-issuer">{cert.issuer}</p>
+          {cert.year && <span class="cert-year">{cert.year}</span>}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .certs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+
+  .cert-card {
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cert-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+    opacity: 0;
+    transition: opacity var(--transition);
+  }
+
+  .cert-card:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .cert-card:hover::before {
+    opacity: 1;
+  }
+
+  .cert-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    background: var(--accent-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .cert-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+    line-height: 1.4;
+  }
+
+  .cert-issuer {
+    font-size: 0.8rem;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .cert-year {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    padding: 0.15rem 0.5rem;
+    border-radius: 100px;
+    background: var(--bg-card-hover);
+  }
+</style>

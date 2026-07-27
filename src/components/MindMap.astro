@@ -1,0 +1,401 @@
+---
+import { resume } from '../data/resume';
+const { mindmap } = resume;
+---
+
+<section class="section mindmap-section" id="habilidades">
+  <div class="container">
+    <div data-reveal>
+      <p class="section-label">// Habilidades</p>
+      <h2 class="section-title">Mapa Mental de Competências</h2>
+      <p class="section-subtitle">Visão interativa das minhas habilidades técnicas e ferramentas.</p>
+    </div>
+
+    <div class="mindmap-wrapper" data-reveal="delay-1">
+      <canvas class="mindmap-canvas" id="mindmap-canvas"></canvas>
+      <div class="mindmap-tooltip" id="mindmap-tooltip"></div>
+    </div>
+
+    <div class="mindmap-legend" data-reveal="delay-2">
+      {mindmap.branches.map((branch) => (
+        <div class="legend-item">
+          <span class="legend-dot" style={`background: ${branch.color}`}></span>
+          <span class="legend-label">{branch.label}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ mindmap }}>
+  function drawMindmap() {
+    const canvas = document.getElementById('mindmap-canvas');
+    if (!canvas) return;
+    const tooltip = document.getElementById('mindmap-tooltip');
+    const wrapper = canvas.parentElement;
+    const dpr = window.devicePixelRatio || 1;
+
+    const rect = wrapper.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    const cx = w / 2;
+    const cy = h / 2;
+    const centerRadius = Math.min(w, h) * 0.055;
+    const branchRadius = Math.min(w, h) * 0.32;
+    const leafRadius = Math.min(w, h) * 0.032;
+    const leafDistance = Math.min(w, h) * 0.18;
+
+    const branches = mindmap.branches;
+    const angleStep = (Math.PI * 2) / branches.length;
+    const startAngle = -Math.PI / 2;
+
+    const nodes = [];
+
+    function getThemeColors() {
+      const style = getComputedStyle(document.documentElement);
+      return {
+        text: style.getPropertyValue('--text-primary').trim() || '#e4e4e7',
+        textSec: style.getPropertyValue('--text-secondary').trim() || '#a1a1aa',
+        textMuted: style.getPropertyValue('--text-muted').trim() || '#71717a',
+      };
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      const colors = getThemeColors();
+
+      // glow behind center
+      const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, centerRadius * 3);
+      glow.addColorStop(0, 'rgba(0, 212, 170, 0.08)');
+      glow.addColorStop(1, 'rgba(0, 212, 170, 0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, centerRadius * 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw connections from center to branches
+      branches.forEach((branch, bi) => {
+        const angle = startAngle + bi * angleStep;
+        const bx = cx + Math.cos(angle) * branchRadius;
+        const by = cy + Math.sin(angle) * branchRadius;
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(bx, by);
+        ctx.strokeStyle = branch.color + '30';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([8, 6]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      });
+
+      // Draw connections from branches to leaves
+      branches.forEach((branch, bi) => {
+        const angle = startAngle + bi * angleStep;
+        const bx = cx + Math.cos(angle) * branchRadius;
+        const by = cy + Math.sin(angle) * branchRadius;
+
+        const count = branch.items.length;
+        const spread = Math.PI * 0.7;
+
+        branch.items.forEach((item, ii) => {
+          const t = count === 1 ? 0 : (ii / (count - 1)) - 0.5;
+          const leafAngle = angle + t * spread;
+          const lx = bx + Math.cos(leafAngle) * leafDistance;
+          const ly = by + Math.sin(leafAngle) * leafDistance;
+
+          ctx.beginPath();
+          ctx.moveTo(bx, by);
+          ctx.lineTo(lx, ly);
+          ctx.strokeStyle = branch.color + '18';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        });
+      });
+
+      // Draw leaf nodes
+      branches.forEach((branch, bi) => {
+        const angle = startAngle + bi * angleStep;
+        const bx = cx + Math.cos(angle) * branchRadius;
+        const by = cy + Math.sin(angle) * branchRadius;
+
+        const count = branch.items.length;
+        const spread = Math.PI * 0.7;
+
+        branch.items.forEach((item, ii) => {
+          const t = count === 1 ? 0 : (ii / (count - 1)) - 0.5;
+          const leafAngle = angle + t * spread;
+          const lx = bx + Math.cos(leafAngle) * leafDistance;
+          const ly = by + Math.sin(leafAngle) * leafDistance;
+
+          // leaf pill bg
+          ctx.beginPath();
+          const pillW = Math.max(ctx.measureText(item).width + 18, 60);
+          const pillH = 26;
+          const pillR = 13;
+          const px = lx - pillW / 2;
+          const py = ly - pillH / 2;
+          ctx.roundRect(px, py, pillW, pillH, pillR);
+          ctx.fillStyle = branch.color + '12';
+          ctx.fill();
+          ctx.strokeStyle = branch.color + '30';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          // leaf text
+          ctx.fillStyle = colors.textSec;
+          ctx.font = `500 ${Math.max(10, centerRadius * 0.32)}px Inter, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(item, lx, ly + 1);
+
+          nodes.push({ x: lx, y: ly, w: pillW, h: pillH, label: item, color: branch.color, type: 'leaf' });
+        });
+      });
+
+      // Draw branch nodes
+      branches.forEach((branch, bi) => {
+        const angle = startAngle + bi * angleStep;
+        const bx = cx + Math.cos(angle) * branchRadius;
+        const by = cy + Math.sin(angle) * branchRadius;
+        const bRadius = centerRadius * 0.75;
+
+        // branch glow
+        const bGlow = ctx.createRadialGradient(bx, by, 0, bx, by, bRadius * 2.5);
+        bGlow.addColorStop(0, branch.color + '15');
+        bGlow.addColorStop(1, branch.color + '00');
+        ctx.fillStyle = bGlow;
+        ctx.beginPath();
+        ctx.arc(bx, by, bRadius * 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // branch circle
+        ctx.beginPath();
+        ctx.arc(bx, by, bRadius, 0, Math.PI * 2);
+        ctx.fillStyle = branch.color + '20';
+        ctx.fill();
+        ctx.strokeStyle = branch.color;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // branch text
+        ctx.fillStyle = branch.color;
+        ctx.font = `700 ${Math.max(11, centerRadius * 0.35)}px Inter, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(branch.label, bx, by);
+
+        nodes.push({ x: bx, y: by, r: bRadius, label: branch.label, color: branch.color, type: 'branch', items: branch.items });
+      });
+
+      // Draw center node
+      const cGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, centerRadius);
+      cGrad.addColorStop(0, '#00d4aa');
+      cGrad.addColorStop(1, '#7c3aed');
+      ctx.beginPath();
+      ctx.arc(cx, cy, centerRadius, 0, Math.PI * 2);
+      ctx.fillStyle = cGrad;
+      ctx.fill();
+
+      // center glow
+      const cGlow = ctx.createRadialGradient(cx, cy, centerRadius * 0.5, cx, cy, centerRadius * 2.5);
+      cGlow.addColorStop(0, 'rgba(0, 212, 170, 0.12)');
+      cGlow.addColorStop(1, 'rgba(0, 212, 170, 0)');
+      ctx.fillStyle = cGlow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, centerRadius * 2.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = 'white';
+      ctx.font = `800 ${Math.max(13, centerRadius * 0.4)}px Inter, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Wesley', cx, cy - centerRadius * 0.15);
+      ctx.font = `400 ${Math.max(9, centerRadius * 0.25)}px Inter, sans-serif`;
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.fillText('Alves', cx, cy + centerRadius * 0.25);
+
+      nodes.push({ x: cx, y: cy, r: centerRadius, label: 'Wesley Alves', type: 'center' });
+    }
+
+    draw();
+
+    // Tooltip + hover
+    let hoveredNode = null;
+
+    canvas.addEventListener('mousemove', (e) => {
+      const canvasRect = canvas.getBoundingClientRect();
+      const mx = e.clientX - canvasRect.left;
+      const my = e.clientY - canvasRect.top;
+
+      let found = null;
+      for (const node of nodes) {
+        if (node.type === 'center' || node.type === 'branch') {
+          const dist = Math.hypot(mx - node.x, my - node.y);
+          if (dist <= (node.r || 30) + 5) { found = node; break; }
+        } else {
+          if (Math.abs(mx - node.x) < node.w / 2 + 5 && Math.abs(my - node.y) < node.h / 2 + 5) {
+            found = node;
+            break;
+          }
+        }
+      }
+
+      if (found !== hoveredNode) {
+        hoveredNode = found;
+        draw();
+
+        if (found && found.type !== 'center') {
+          canvas.style.cursor = 'pointer';
+          if (tooltip) {
+            if (found.type === 'branch') {
+              tooltip.innerHTML = `<strong style="color:${found.color}">${found.label}</strong><br/><span style="color:var(--text-secondary)">${found.items.join(' · ')}</span>`;
+            } else {
+              tooltip.innerHTML = `<strong style="color:${found.color}">${found.label}</strong>`;
+            }
+            tooltip.style.opacity = '1';
+            tooltip.style.left = (e.clientX - canvasRect.left + 15) + 'px';
+            tooltip.style.top = (e.clientY - canvasRect.top - 10) + 'px';
+          }
+        } else {
+          canvas.style.cursor = 'default';
+          if (tooltip) tooltip.style.opacity = '0';
+        }
+
+        // redraw with hover highlight
+        if (found) {
+          ctx.clearRect(0, 0, w, h);
+          draw();
+          if (found.type === 'branch') {
+            // highlight branch
+            const bRadius = centerRadius * 0.75;
+            ctx.beginPath();
+            ctx.arc(found.x, found.y, bRadius + 4, 0, Math.PI * 2);
+            ctx.strokeStyle = found.color + '60';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+          } else if (found.type === 'leaf') {
+            const pillW = Math.max(ctx.measureText(found.label).width + 22, 64);
+            const pillH = 30;
+            const pillR = 15;
+            ctx.beginPath();
+            ctx.roundRect(found.x - pillW / 2, found.y - pillH / 2, pillW, pillH, pillR);
+            ctx.fillStyle = found.color + '25';
+            ctx.fill();
+            ctx.strokeStyle = found.color;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          }
+        }
+      }
+
+      if (found && tooltip) {
+        const canvasRect = canvas.getBoundingClientRect();
+        tooltip.style.left = (e.clientX - canvasRect.left + 15) + 'px';
+        tooltip.style.top = (e.clientY - canvasRect.top - 10) + 'px';
+      }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      hoveredNode = null;
+      draw();
+      if (tooltip) tooltip.style.opacity = '0';
+      canvas.style.cursor = 'default';
+    });
+
+    window.addEventListener('resize', () => {
+      const r = wrapper.getBoundingClientRect();
+      const nw = r.width;
+      const nh = r.height;
+      canvas.width = nw * dpr;
+      canvas.height = nh * dpr;
+      canvas.style.width = nw + 'px';
+      canvas.style.height = nh + 'px';
+      ctx.scale(dpr, dpr);
+      nodes.length = 0;
+      draw();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', drawMindmap);
+  } else {
+    drawMindmap();
+  }
+</script>
+
+<style>
+  .mindmap-wrapper {
+    position: relative;
+    margin-top: 3rem;
+    width: 100%;
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    overflow: hidden;
+    aspect-ratio: 5 / 3;
+  }
+
+  .mindmap-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .mindmap-tooltip {
+    position: absolute;
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    border: 1px solid var(--bg-card-border);
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 10;
+    max-width: 280px;
+    box-shadow: var(--shadow-card);
+    line-height: 1.5;
+  }
+
+  .mindmap-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .legend-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .mindmap-wrapper {
+      aspect-ratio: 1 / 1;
+    }
+  }
+</style>

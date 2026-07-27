@@ -1,0 +1,228 @@
+---
+import { resume } from '../data/resume';
+
+const allItems = [
+  ...resume.experience.map(e => ({ ...e, category: 'work' })),
+  ...resume.education.map(e => ({ ...e, role: e.degree, company: e.institution, category: 'education' })),
+].sort((a, b) => {
+  const getOrder = (item: any) => {
+    if (item.period?.includes('Atual')) return 100;
+    const match = item.period?.match(/(\d{4})/);
+    return match ? parseInt(match[1]) : 0;
+  };
+  return getOrder(b) - getOrder(a);
+});
+---
+
+<section class="section timeline-section" id="trajetoria">
+  <div class="container">
+    <div data-reveal>
+      <p class="section-label">// Trajetória</p>
+      <h2 class="section-title">Experiência & Formação</h2>
+      <p class="section-subtitle">Minha jornada profissional e acadêmica ao longo dos anos.</p>
+    </div>
+
+    <div class="timeline" data-reveal="delay-1">
+      <div class="timeline-line"></div>
+      {allItems.map((item, i) => (
+        <div class={`timeline-item ${i % 2 === 0 ? 'left' : 'right'}`} data-reveal={`delay-${Math.min(i + 1, 4)}`}>
+          <div class={`timeline-dot ${item.category}`}>
+            {item.category === 'work' ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+              </svg>
+            )}
+          </div>
+          <div class="timeline-card">
+            <div class="timeline-card-header">
+              <span class={`timeline-badge ${item.category}`}>
+                {item.category === 'work' ? 'Trabalho' : 'Formação'}
+              </span>
+              <span class="timeline-period">{item.period}</span>
+            </div>
+            <h3 class="timeline-role">{item.role}</h3>
+            <p class="timeline-company">{item.company}</p>
+            {item.description && (
+              <p class="timeline-desc">{item.description}</p>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .timeline-section {
+    background: var(--bg-secondary);
+  }
+
+  .timeline {
+    position: relative;
+    margin-top: 3rem;
+    padding: 1rem 0;
+  }
+
+  .timeline-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--accent), var(--accent-secondary), transparent);
+    transform: translateX(-50%);
+  }
+
+  .timeline-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 3rem;
+    width: 50%;
+  }
+
+  .timeline-item.left {
+    padding-right: 3rem;
+    justify-content: flex-end;
+  }
+
+  .timeline-item.right {
+    margin-left: 50%;
+    padding-left: 3rem;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    top: 1.5rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    border: 3px solid var(--bg-secondary);
+  }
+
+  .timeline-item.left .timeline-dot {
+    right: -18px;
+  }
+
+  .timeline-item.right .timeline-dot {
+    left: -18px;
+  }
+
+  .timeline-dot.work {
+    background: var(--accent);
+    color: #0a0a0f;
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  .timeline-dot.education {
+    background: var(--accent-secondary);
+    color: white;
+    box-shadow: 0 0 20px var(--accent-secondary-glow);
+  }
+
+  .timeline-card {
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    backdrop-filter: blur(10px);
+    transition: all var(--transition);
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .timeline-card:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .timeline-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  .timeline-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .timeline-badge.work {
+    background: var(--accent-glow);
+    color: var(--accent);
+  }
+
+  .timeline-badge.education {
+    background: var(--accent-secondary-glow);
+    color: var(--accent-secondary);
+  }
+
+  .timeline-period {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .timeline-role {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: var(--text-primary);
+  }
+
+  .timeline-company {
+    font-size: 0.875rem;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+  }
+
+  .timeline-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .timeline-line {
+      left: 18px;
+    }
+
+    .timeline-item,
+    .timeline-item.left,
+    .timeline-item.right {
+      width: 100%;
+      margin-left: 0;
+      padding-left: 3.5rem;
+      padding-right: 0;
+      justify-content: flex-start;
+    }
+
+    .timeline-item.left .timeline-dot,
+    .timeline-item.right .timeline-dot {
+      left: 0;
+      right: auto;
+    }
+
+    .timeline-card {
+      max-width: 100%;
+    }
+  }
+</style>
