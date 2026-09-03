@@ -1,8 +1,8 @@
 export const resume = {
   name: 'Wesley Alves Ferreira',
-  title: 'Análise de Dados & Soluções Tecnológicas',
+  title: 'Ciência de Dados & Soluções Tecnológicas',
   summary:
-    'Com mais de cinco anos de experiência no setor de tecnologia, sou um profissional em análise de dados e desenvolvimento de soluções tecnológicas (sistemas da informação e bancos de dados). Mas atuo em outras áreas de conhecimento por estarem conectadas com meu campo de estudo e formação.',
+    'Sou estudante de Ciência de Dados e profissional em constante evolução na área de Tecnologia. Minha trajetória combina experiência prática em ambientes administrativos e de atendimento com conhecimentos em programação, análise de dados, bancos de dados, inteligência artificial, suporte de TI e computação em nuvem. Gosto de entender como sistemas, processos e dados podem trabalhar juntos para resolver problemas reais, desenvolvendo projetos que vão além do aprendizado teórico.',
   email: 'wesleyprofissional2020@gmail.com',
   location: 'Nova Friburgo, RJ',
   socials: {
@@ -12,20 +12,21 @@ export const resume = {
 
   experience: [
     {
-      role: 'Estudante de Data Science',
-      company: 'Estácio de Sá — Polo Nova Friburgo',
-      period: '2024 — Atual',
-      type: 'work',
-      description:
-        'Graduação em andamento, aprofundando conhecimentos em análise de dados, machine learning e soluções tecnológicas.',
-    },
-    {
-      role: 'Autônomo — Soluções Tecnológicas',
+      role: 'Atuação como Autônomo — Soluções Tecnológicas',
       company: 'Autônomo',
       period: '2023 — Atual',
       type: 'work',
       description:
         'Desenvolvimento de soluções sob demanda, consultoria em dados, automação e ferramentas tecnológicas para empresas e projetos próprios.',
+    },
+    {
+      role: 'Colaboração na Plataforma OrdoB — Projetos Privados',
+      company: 'ordob.com',
+      period: '2025 — Atual',
+      type: 'work',
+      description:
+        'Participação em projetos colaborativos na plataforma OrdoB. Projetos privados envolvendo desenvolvimento Full Stack, integrações de APIs e automações. Projetos: Libryno (sistema de gestão de estoque para bibliotecas) e outras soluções em andamento.',
+      url: 'https://ordob.com',
     },
     {
       role: 'Criação do Pasty',
@@ -34,6 +35,7 @@ export const resume = {
       type: 'work',
       description:
         'Criação e desenvolvimento do Pasty, ferramenta web para compartilhamento e gestão de textos/colagens online.',
+      url: 'https://pasty.ordob.com',
     },
     {
       role: 'Criação do Artigo com Café',
@@ -42,6 +44,7 @@ export const resume = {
       type: 'work',
       description:
         'Criação e desenvolvimento de blog temático sobre cafeteria digital. Projeto autoral com foco em conteúdo, experiência do usuário e monetização.',
+      url: 'https://artigocomcafe.com',
     },
     {
       role: 'Atendimento / Vendas',
@@ -63,6 +66,12 @@ export const resume = {
 
   education: [
     {
+      degree: 'Graduação em Ciência de Dados',
+      institution: 'Estácio de Sá — Polo Nova Friburgo',
+      period: '2024 — Atual',
+      type: 'education',
+    },
+    {
       degree: 'Técnico em Informática',
       institution: 'EEEP Manoel Mano — CE',
       period: '2017 — 2019',
@@ -78,6 +87,17 @@ export const resume = {
 
   projects: [
     {
+      name: 'Libryno',
+      subtitle: 'Sistema de Gestão de Estoque para Bibliotecas',
+      context: 'libryno.ordob.com — Colaboração OrdoB',
+      description:
+        'Sistema completo de armazenamento, banco de dados integrado e ferramentas de buscas usando API. Metodologia RAD. Desenvolvido em colaboração com a plataforma OrdoB para a Biblioteca Pública Municipal Maria Margarida Liguori — Nova Friburgo.',
+      tags: ['Python', 'SQL', 'API', 'RAD', 'Banco de Dados'],
+      url: 'https://libryno.ordob.com',
+      github: 'https://github.com/ordo-b/LIBRYNO',
+      highlight: true,
+    },
+    {
       name: 'Artigo com Café',
       subtitle: 'Blog de Cafeteria Digital',
       context: 'artigocomcafe.com',
@@ -85,65 +105,77 @@ export const resume = {
         'Blog autoral sobre cafeteria digital. Projeto em construção com foco em conteúdo, experiência do usuário e monetização.',
       tags: ['Web', 'Blog', 'Conteúdo', 'UI/UX'],
       url: 'https://artigocomcafe.com',
+      github: 'https://github.com/WesleyAlvesDS/artigocomcafe',
       wip: true,
       highlight: true,
     },
     {
-      name: 'Librino',
-      subtitle: 'Sistema de Gestão de Estoque para Bibliotecas',
-      context: 'Biblioteca Pública Municipal Maria Margarida Liguori — Nova Friburgo',
-      description:
-        'Sistema completo de armazenamento, banco de dados integrado e ferramentas de buscas usando API. Metodologia RAD.',
-      tags: ['Python', 'SQL', 'API', 'RAD', 'Banco de Dados'],
-    },
-    {
       name: 'Pasty',
       subtitle: 'Ferramenta Web de Colagens',
-      context: 'pasty.ordob.com',
+      context: 'pasty.ordob.com — Colaboração OrdoB',
       description:
-        'Desenvolvimento web da ferramenta para compartilhamento e gestão de textos/colagens online. Responsável apenas pela parte de frontend/desenvolvimento.',
+        'Desenvolvimento web da ferramenta para compartilhamento e gestão de textos/colagens online. Responsável pela parte de frontend/desenvolvimento.',
       tags: ['Web', 'Ferramenta', 'Frontend', 'Desenvolvimento Web'],
       url: 'https://pasty.ordob.com',
+      github: 'https://github.com/WesleyAlvesDS/OrdoB-Pasty',
       highlight: true,
+    },
+  ],
+
+  privateProjects: [
+    {
+      name: 'Projetos OrdoB',
+      subtitle: 'Plataforma OrdoB',
+      context: 'ordob.com',
+      description:
+        'Participo de projetos privados na plataforma OrdoB, uma plataforma de desenvolvimento colaborativo de software. Esses projetos envolvem Full Stack, integrações de APIs e automações. Projetos como Libryno (gestão de bibliotecas) e outras soluções estão em desenvolvimento.',
+      tags: ['Python', 'SQL', 'API', 'Full Stack', 'Automação'],
+      url: 'https://ordob.com',
     },
   ],
 
   skills: {
     technical: [
-      'Análise Exploratória de Dados',
+      'Análise Exploratória de Dados (EDA)',
       'Análise Estatística de Dados',
       'Machine Learning',
-      'Aplicações Python',
-      'Banco de Dados',
       'Inteligência Artificial',
       'Big Data',
-      'Programação',
-      'Gerenciamento de Loja e Caixa',
-      'Assistente Administrativo e Liderança de Equipes',
-      'Metodologia Ágil (RAD)',
-      'Manutenção de Computadores e Redes',
-      'Atendimento ao Cliente (presencial e Helpdesk)',
-      'Suporte ao Cliente Remoto',
-      'ERP',
+      'Desenvolvimento de Aplicações em Python',
+      'Programação Orientada a Objetos',
+      'Banco de Dados Relacionais e NoSQL',
+      'SQL',
+      'ETL e tratamento de dados',
+      'Análise e acompanhamento de KPIs',
+      'Administração e gerenciamento de sistemas ERP',
+      'Manutenção de computadores',
+      'Redes de computadores',
+      'Suporte técnico e Help Desk',
+      'Suporte remoto a usuários',
+      'Metodologias Ágeis (RAD, Kanban)',
     ],
     tools: [
-      'Pacote Office — Microsoft',
-      'GitHub e Kanban',
       'Python',
-      'SQL e NoSQL',
+      'Pandas',
+      'R',
+      'SQL',
+      'NoSQL',
+      'Microsoft Azure',
+      'AWS',
+      'GitHub',
       'Excel Avançado',
       'Power BI',
-      'Power Automate',
-      'Microsoft Azure',
-      'ChatGPT / Gemini',
-      'R',
-      'AnyDesk / TeamViewer',
+      'Google Gemini',
+      'ChatGPT',
+      'AnyDesk',
+      'TeamViewer',
       'MotoTalk',
-      'Dynamics 365',
+      'Sistemas ERP',
     ],
   },
 
   certifications: [
+    { name: 'Graduação em Ciência de Dados', issuer: 'Estácio de Sá', year: '2024 — Atual' },
     { name: 'Desenvolvimento de Aplicações Python', issuer: 'Estácio', year: '2026' },
     { name: 'Liderança e Gestão de Equipes', issuer: 'ENAP', year: '2026' },
     { name: 'Inteligência Emocional', issuer: 'ENAP', year: '2026' },
@@ -158,22 +190,22 @@ export const resume = {
       {
         label: 'Dados & IA',
         color: '#00d4aa',
-        items: ['Análise Exploratória', 'Estatística', 'Machine Learning', 'Big Data', 'Power BI'],
+        items: ['Análise Exploratória', 'Estatística', 'Machine Learning', 'Big Data', 'Power BI', 'ChatGPT / Gemini'],
       },
       {
         label: 'Programação',
         color: '#7c3aed',
-        items: ['Python', 'SQL / NoSQL', 'R', 'Excel Avançado'],
+        items: ['Python', 'SQL / NoSQL', 'R', 'Pandas', 'Excel Avançado'],
       },
       {
-        label: 'Infraestrutura',
+        label: 'Cloud & Infra',
         color: '#f59e0b',
-        items: ['Microsoft Azure', 'Banco de Dados', 'Manutenção de Redes', 'ERP'],
+        items: ['Microsoft Azure', 'AWS', 'Banco de Dados', 'Redes', 'Manutenção', 'ERP'],
       },
       {
         label: 'Ferramentas',
         color: '#ef4444',
-        items: ['Office 365', 'GitHub / Kanban', 'Power Automate', 'Dynamics 365'],
+        items: ['GitHub / Kanban', 'Power Automate', 'Dynamics 365', 'AnyDesk / TeamViewer', 'MotoTalk'],
       },
       {
         label: 'Soft Skills',
